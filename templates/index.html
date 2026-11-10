@@ -1,0 +1,558 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student Academic Performance Prediction</title>
+<style>
+    * { box-sizing: border-box; }
+    body {
+        font-family: Arial, sans-serif;
+        background: #f4f7fb;
+        color: #263445;
+        margin: 0;
+        padding: 28px 16px;
+    }
+    .container {
+        max-width: 1050px;
+        margin: auto;
+        background: white;
+        padding: 32px;
+        border-radius: 14px;
+        box-shadow: 0 4px 18px rgba(0,0,0,0.07);
+    }
+    h1 { color: #183b63; margin-top: 0; }
+    .intro { color: #536477; line-height: 1.6; }
+    .notice {
+        background: #eef5ff;
+        border-left: 4px solid #3978bd;
+        padding: 12px 16px;
+        margin: 22px 0;
+        border-radius: 5px;
+        line-height: 1.5;
+    }
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 22px 26px;
+    }
+    .field label {
+        display: block;
+        font-weight: 700;
+        margin-bottom: 8px;
+    }
+    input, select {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #bdc8d4;
+        border-radius: 7px;
+        background: white;
+        font-size: 15px;
+    }
+    input:focus, select:focus {
+        outline: 2px solid #83b7ed;
+        border-color: #3978bd;
+    }
+    small {
+        display: block;
+        color: #617184;
+        margin-top: 6px;
+        line-height: 1.4;
+    }
+    button {
+        margin-top: 28px;
+        width: 100%;
+        padding: 15px;
+        border: 0;
+        border-radius: 8px;
+        background: #245b91;
+        color: white;
+        font-size: 17px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+    button:hover { background: #19466f; }
+    #result {
+        display: none;
+        margin-top: 24px;
+        padding: 20px;
+        border-radius: 8px;
+        background: #eaf6ee;
+        color: #205c35;
+        text-align: center;
+        font-size: 20px;
+        font-weight: bold;
+    }
+    #error {
+        color: #a12b2b;
+        margin-top: 16px;
+    }
+    @media (max-width: 700px) {
+        .form-grid { grid-template-columns: 1fr; }
+        .container { padding: 22px 16px; }
+    }
+</style>
+</head>
+<body>
+<div class="container">
+    <h1>Student Academic Performance Prediction</h1>
+    <p class="intro">
+        Enter the student's information below to estimate their final
+        academic grade. Each field includes a short explanation.
+    </p>
+    <div class="notice">
+        <strong>Before you begin:</strong> Select the option that best
+        describes the student. For number fields, stay within the
+        displayed range. The predicted grade is an estimate, not a
+        guaranteed result.
+    </div>
+
+    <form id="predictionForm">
+        <div class="form-grid">
+            
+    <div class="field">
+        <label for="school">School</label>
+        
+        <select id="school" name="school" required>
+            <option value="" disabled selected>Choose an option</option>
+            <option value="GP">GP</option><option value="MS">MS</option>
+        </select>
+        
+        <small>
+    GP = Gabriel Pereira; MS = Mousinho da Silveira.
+    These are the two Portuguese schools used in the training dataset.
+    This model has not been validated for students from other schools or countries.
+</small>
+    </div>
+    
+
+    <div class="field">
+        <label for="sex">Student&#x27;s Sex</label>
+        
+        <select id="sex" name="sex" required>
+            <option value="" disabled selected>Choose an option</option>
+            <option value="F">F</option><option value="M">M</option>
+        </select>
+        
+        <small>Select the recorded category.</small>
+    </div>
+    
+
+    <div class="field">
+        <label for="age">Age</label>
+        
+        <input type="number" id="age" name="age"
+               min="15" max="22" step="1"
+               placeholder="Enter a value (15–22)" required>
+        
+        <small>Student&#x27;s age in years.</small>
+    </div>
+    
+
+    <div class="field">
+        <label for="address">Home Area</label>
+        
+        <select id="address" name="address" required>
+            <option value="" disabled selected>Choose an option</option>
+            <option value="U">U</option><option value="R">R</option>
+        </select>
+        
+        <small>U = Urban area; R = Rural area.</small>
+    </div>
+    
+
+    <div class="field">
+        <label for="famsize">Family Size</label>
+        
+        <select id="famsize" name="famsize" required>
+            <option value="" disabled selected>Choose an option</option>
+            <option value="GT3">GT3</option><option value="LE3">LE3</option>
+        </select>
+        
+        <small>GT3 = More than 3 people; LE3 = 3 or fewer.</small>
+    </div>
+    
+
+    <div class="field">
+        <label for="Pstatus">Parents&#x27; Living Arrangement</label>
+        
+        <select id="Pstatus" name="Pstatus" required>
+            <option value="" disabled selected>Choose an option</option>
+            <option value="T">T</option><option value="A">A</option>
+        </select>
+        
+        <small>T = Living together; A = Living apart.</small>
+    </div>
+    
+
+    <div class="field">
+        <label for="Medu">Mother&#x27;s Education Level</label>
+        
+        <input type="number" id="Medu" name="Medu"
+               min="0" max="4" step="1"
+               placeholder="Enter a value (0–4)" required>
+        
+        <small>0 = None, 1 = Primary, 2 = Grades 5–9, 3 = Secondary, 4 = Higher education.</small>
+    </div>
+    
+
+    <div class="field">
+        <label for="Fedu">Father&#x27;s Education Level</label>
+        
+        <input type="number" id="Fedu" name="Fedu"
+               min="0" max="4" step="1"
+               placeholder="Enter a value (0–4)" required>
+        
+        <small>0 = None, 1 = Primary, 2 = Grades 5–9, 3 = Secondary, 4 = Higher education.</small>
+    </div>
+    
+
+    <div class="field">
+        <label for="Mjob">Mother&#x27;s Occupation</label>
+        
+        <select id="Mjob" name="Mjob" required>
+            <option value="" disabled selected>Choose an option</option>
+            <option value="at_home">at_home</option><option value="health">health</option><option value="other">other</option><option value="services">services</option><option value="teacher">teacher</option>
+        </select>
+        
+        <small>Choose the closest occupation category.</small>
+    </div>
+    
+
+    <div class="field">
+        <label for="Fjob">Father&#x27;s Occupation</label>
+        
+        <select id="Fjob" name="Fjob" required>
+            <option value="" disabled selected>Choose an option</option>
+            <option value="at_home">at_home</option><option value="health">health</option><option value="other">other</option><option value="services">services</option><option value="teacher">teacher</option>
+        </select>
+        
+        <small>Choose the closest occupation category.</small>
+    </div>
+    
+
+    <div class="field">
+        <label for="reason">Reason for Choosing the School</label>
+        
+        <select id="reason" name="reason" required>
+            <option value="" disabled selected>Choose an option</option>
+            <option value="course">course</option><option value="home">home</option><option value="reputation">reputation</option><option value="other">other</option>
+        </select>
+        
+        <small>The main reason the student chose this school.</small>
+    </div>
+    
+
+    <div class="field">
+        <label for="guardian">Main Guardian</label>
+        
+        <select id="guardian" name="guardian" required>
+            <option value="" disabled selected>Choose an option</option>
+            <option value="mother">mother</option><option value="father">father</option><option value="other">other</option>
+        </select>
+        
+        <small>The person mainly responsible for the student.</small>
+    </div>
+    
+
+    <div class="field">
+        <label for="traveltime">Travel Time to School</label>
+        
+        <input type="number" id="traveltime" name="traveltime"
+               min="1" max="4" step="1"
+               placeholder="Enter a value (1–4)" required>
+        
+        <small>1 = Under 15 min; 2 = 15–30 min; 3 = 30–60 min; 4 = Over 1 hour.</small>
+    </div>
+    
+
+    <div class="field">
+        <label for="studytime">Weekly Study Time</label>
+        
+        <input type="number" id="studytime" name="studytime"
+               min="1" max="4" step="1"
+               placeholder="Enter a value (1–4)" required>
+        
+        <small>1 = Under 2 hrs; 2 = 2–5 hrs; 3 = 5–10 hrs; 4 = Over 10 hrs.</small>
+    </div>
+    
+
+    <div class="field">
+        <label for="failures">Previous Class Failures</label>
+        
+        <input type="number" id="failures" name="failures"
+               min="0" max="3" step="1"
+               placeholder="Enter a value (0–3)" required>
+        
+        <small>Number of previous classes failed (0–3).</small>
+    </div>
+    
+
+    <div class="field">
+        <label for="schoolsup">Extra School Support</label>
+        
+        <select id="schoolsup" name="schoolsup" required>
+            <option value="" disabled selected>Choose an option</option>
+            <option value="yes">yes</option><option value="no">no</option>
+        </select>
+        
+        <small>Does the student receive extra educational support from school?</small>
+    </div>
+    
+
+    <div class="field">
+        <label for="famsup">Family Educational Support</label>
+        
+        <select id="famsup" name="famsup" required>
+            <option value="" disabled selected>Choose an option</option>
+            <option value="yes">yes</option><option value="no">no</option>
+        </select>
+        
+        <small>Does the student receive educational support from family?</small>
+    </div>
+    
+
+    <div class="field">
+        <label for="paid">Paid Extra Classes</label>
+        
+        <select id="paid" name="paid" required>
+            <option value="" disabled selected>Choose an option</option>
+            <option value="yes">yes</option><option value="no">no</option>
+        </select>
+        
+        <small>Does the student attend paid extra classes?</small>
+    </div>
+    
+
+    <div class="field">
+        <label for="activities">Extracurricular Activities</label>
+        
+        <select id="activities" name="activities" required>
+            <option value="" disabled selected>Choose an option</option>
+            <option value="yes">yes</option><option value="no">no</option>
+        </select>
+        
+        <small>Does the student participate in activities outside lessons?</small>
+    </div>
+    
+
+    <div class="field">
+        <label for="nursery">Nursery School Attendance</label>
+        
+        <select id="nursery" name="nursery" required>
+            <option value="" disabled selected>Choose an option</option>
+            <option value="yes">yes</option><option value="no">no</option>
+        </select>
+        
+        <small>Did the student attend nursery school?</small>
+    </div>
+    
+
+    <div class="field">
+        <label for="higher">Plans for Higher Education</label>
+        
+        <select id="higher" name="higher" required>
+            <option value="" disabled selected>Choose an option</option>
+            <option value="yes">yes</option><option value="no">no</option>
+        </select>
+        
+        <small>Does the student want to pursue higher education?</small>
+    </div>
+    
+
+    <div class="field">
+        <label for="internet">Internet Access at Home</label>
+        
+        <select id="internet" name="internet" required>
+            <option value="" disabled selected>Choose an option</option>
+            <option value="yes">yes</option><option value="no">no</option>
+        </select>
+        
+        <small>Does the student have internet access at home?</small>
+    </div>
+    
+
+    <div class="field">
+        <label for="romantic">In a Romantic Relationship</label>
+        
+        <select id="romantic" name="romantic" required>
+            <option value="" disabled selected>Choose an option</option>
+            <option value="yes">yes</option><option value="no">no</option>
+        </select>
+        
+        <small>Is the student currently in a romantic relationship?</small>
+    </div>
+    
+
+    <div class="field">
+        <label for="famrel">Family Relationship Quality</label>
+        
+        <input type="number" id="famrel" name="famrel"
+               min="1" max="5" step="1"
+               placeholder="Enter a value (1–5)" required>
+        
+        <small>Rate from 1 (very poor) to 5 (excellent).</small>
+    </div>
+    
+
+    <div class="field">
+        <label for="freetime">Free Time After School</label>
+        
+        <input type="number" id="freetime" name="freetime"
+               min="1" max="5" step="1"
+               placeholder="Enter a value (1–5)" required>
+        
+        <small>Rate from 1 (very little) to 5 (a lot).</small>
+    </div>
+    
+
+    <div class="field">
+        <label for="goout">Going Out with Friends</label>
+        
+        <input type="number" id="goout" name="goout"
+               min="1" max="5" step="1"
+               placeholder="Enter a value (1–5)" required>
+        
+        <small>Frequency: 1 (very low) to 5 (very high).</small>
+    </div>
+    
+
+    <div class="field">
+        <label for="Dalc">Weekday Alcohol Consumption</label>
+        
+        <input type="number" id="Dalc" name="Dalc"
+               min="1" max="5" step="1"
+               placeholder="Enter a value (1–5)" required>
+        
+        <small>Dataset scale: 1 (very low) to 5 (very high).</small>
+    </div>
+    
+
+    <div class="field">
+        <label for="Walc">Weekend Alcohol Consumption</label>
+        
+        <input type="number" id="Walc" name="Walc"
+               min="1" max="5" step="1"
+               placeholder="Enter a value (1–5)" required>
+        
+        <small>Dataset scale: 1 (very low) to 5 (very high).</small>
+    </div>
+    
+
+    <div class="field">
+        <label for="health">Self-Reported Health</label>
+        
+        <input type="number" id="health" name="health"
+               min="1" max="5" step="1"
+               placeholder="Enter a value (1–5)" required>
+        
+        <small>Rate from 1 (very poor) to 5 (very good).</small>
+    </div>
+    
+
+    <div class="field">
+        <label for="absences">School Absences</label>
+        
+        <input type="number" id="absences" name="absences"
+               min="0" max="32" step="1"
+               placeholder="Enter a value (0–32)" required>
+        
+        <small>Number of school days missed (0–32).</small>
+    </div>
+    
+        </div>
+        <button type="submit">Predict Final Grade</button>
+    </form>
+
+    <div id="result" role="status"></div>
+    <div id="error" role="alert"></div>
+</div>
+
+<script>
+document.getElementById("predictionForm").addEventListener("submit", async function(event) {
+    event.preventDefault();
+
+    const form = event.target;
+    const data = {};
+
+    for (const element of form.elements) {
+        if (!element.name) continue;
+
+        if (element.type === "number") {
+            data[element.name] = Number(element.value);
+        } else {
+            data[element.name] = element.value;
+        }
+    }
+
+    const resultBox = document.getElementById("result");
+    const errorBox = document.getElementById("error");
+
+    resultBox.style.display = "none";
+    errorBox.textContent = "Making prediction...";
+
+    try {
+        const response = await fetch("predict", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(data)
+        });
+
+        const output = await response.json();
+
+        if (!response.ok) {
+            throw new Error(output.error || "Prediction failed.");
+        }
+
+        resultBox.innerHTML = `
+            <h2>Student Performance Assessment</h2>
+
+            <h3>Estimated Final Grade</h3>
+            <div style="font-size:32px; font-weight:bold;">
+                ${Number(output.predicted_final_grade).toFixed(2)} / 20
+            </div>
+
+            <hr>
+
+            <h3>Support Category</h3>
+            <p style="font-size:20px; font-weight:bold;">
+                ${output.support_category}
+            </p>
+
+            <h3>Suggested Action</h3>
+            <p>${output.suggested_action}</p>
+
+            <hr>
+
+            <h3>Factors the Model Relied on Overall</h3>
+            <p style="font-size: 14px; color: #666;">
+                These factors represent general patterns identified by the model
+                across the dataset. They do not explain an individual student's
+                prediction and should not be interpreted as causes of academic performance.
+            </p>
+            <ul style="text-align:left; line-height:1.7;">
+                ${(output.factors_to_consider || []).map(item =>
+                    `<li><strong>${item.factor}:</strong> ${item.explanation}</li>`
+                ).join("")}
+            </ul>
+
+            <hr>
+
+            <small>
+                This is an estimated prediction, not a definitive
+                assessment of the student's academic needs.
+                A teacher should consider additional information
+                before deciding on support.
+            </small>
+        `;
+
+        resultBox.style.display = "block";
+        errorBox.textContent = "";
+    } catch (error) {
+        errorBox.textContent = "Error: " + error.message;
+    }
+});
+</script>
+</body>
+</html>
